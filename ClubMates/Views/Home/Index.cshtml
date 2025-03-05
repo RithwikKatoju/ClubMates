@@ -10,15 +10,13 @@
 <div>
     @foreach (var stu in Model)
     {
-
+        <div>
+            Student Name: @stu.StudentID
+        </div>
     }
+    <a href="home/Addstudent">AddStudent</a>
+    <br />
+    <a href="/Department">Department</a>
+</div>
 
-</div>
-<div>
-    Student Name: @Model.StudentName <br />
-    Student ID: @Model.StudentID <br />
-    Student Date Of Birth: @Model.DateOfBirth <br />
-    Student Height: @Model.Height <br />
-    Student Weight: @Model.Weight <br />
-</div>
 

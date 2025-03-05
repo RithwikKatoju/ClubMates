@@ -1,0 +1,28 @@
+﻿
+@{
+    ViewBag.Title = "AddStudent";
+}
+
+<h2>AddStudent</h2>
+
+<form action="/Home" method="post">
+    <label>Name</label>
+    <input type="text" name="StudentName" />
+    <br />
+    <label>Email</label>
+    <input type="email" name="Email" />
+    <br />
+    <label>Phone Number</label>
+    <input type="tel" name="PhoneNumber" />
+    <br />
+    <label>Date of Birth</label>
+    <input type="datetime" name="DateOfBirth" />
+    <br />
+    <label>Height</label>
+    <input type="number" name="Height" />
+    <br />
+    <label>Weight</label>
+    <input type="number" name="Weight" />
+    <br />
+    <button type="submit">Save</button>
+</form>

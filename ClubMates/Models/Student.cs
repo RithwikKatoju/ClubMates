@@ -12,6 +12,13 @@ namespace ClubMates.Models
         public DateTime DateOfBirth { get; set; }
         public decimal Height { get; set; }
         public float Weight { get; set; }
+        public int age
+        {
+            get
+            {
+                return DateTime.Now.Year - DateOfBirth.Year;
+            }
+        }
 
     }
 }
