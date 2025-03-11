@@ -1,0 +1,16 @@
+﻿@model ClubMates.Models.Department 
+@{
+    ViewBag.Title = "RemoveDepartment";
+}
+
+<h2>RemoveDepartment</h2>
+
+<form action="/Department/RemoveDepartment" method="post">
+    <label>Department ID</label>
+    <input type="number" name="DepartmentId" value="@Model.DepartmentId" />
+    <br />
+    <label>Department Name</label>
+    <input type="text" name="DepartmentName" value="@Model.DepartmentName" />
+    <br />
+    <button type="submit">Submit</button>
+</form>

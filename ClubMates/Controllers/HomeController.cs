@@ -13,14 +13,6 @@ namespace ClubMates.Controllers
         // GET: Home
         public ActionResult Index()
         {
-            Student student = new Student()
-            {
-                StudentID = 1,
-                StudentName = "Rithwik",
-                DateOfBirth = new DateTime(2004, 05, 31),
-                Height = 179,
-                Weight = 70
-            };
 
             List<Student> students = new List<Student>()
             {
@@ -34,13 +26,14 @@ namespace ClubMates.Controllers
 
         public ActionResult AddStudent()
         {
-            return View();
+            return View(new Student());
         }
 
 
         [HttpPost]
         public ActionResult AddStudent(Student student)
         {
+
             return View();
         }
     }
