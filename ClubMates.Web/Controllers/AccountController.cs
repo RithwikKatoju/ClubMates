@@ -54,12 +54,12 @@ namespace ClubMates.Web.Controllers
             {
                 var Claims = new List<Claim>
                 {
-                    new Claim(ClaimTypes.Name, user.UserName),
-                    new Claim(ClaimTypes.Email, user.Email),
+                    new Claim(ClaimTypes.Name, user.UserName ??""),
+                    new Claim(ClaimTypes.Email, user.Email ?? ""),
                     new Claim(ClaimTypes.NameIdentifier, user.Id),
                     new Claim(ClaimTypes.Role,"Guest")
                 };
-                var ClaimResult = await (_userManager.AddClaimsAsync(user, Claims));
+                await (_userManager.AddClaimsAsync(user, Claims));
             }
             return View("Success");
         }
@@ -120,6 +120,12 @@ namespace ClubMates.Web.Controllers
 
             return Redirect("/Home/Index");
         }
+
+        public IActionResult AccessDenied()
+        {
+            return View();
+        }
+
     }
 }
 

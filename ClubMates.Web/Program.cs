@@ -1,3 +1,4 @@
+using System.Security.Claims;
 using ClubMates.Web.AppDbContext;
 using ClubMates.Web.Models;
 using Microsoft.AspNetCore.Identity;
@@ -34,6 +35,18 @@ builder.Services.AddIdentity<ClubMatesUser, IdentityRole>(Options =>
     };
     Options.User.RequireUniqueEmail = true;
 }).AddEntityFrameworkStores<AppIdentityDbContext>().AddDefaultTokenProviders();
+
+builder.Services.AddAuthorizationBuilder()
+    .AddPolicy("GuestOrSuperAdmin", policy => policy.RequireClaim(ClaimTypes.Role, "SuperAdmin", "Guest") )
+    .AddPolicy("MustBeAGuest", policy => policy.RequireClaim(ClaimTypes.Role, "Guest"));
+
+builder.Services.AddAuthorizationBuilder()
+    .AddPolicy("GuestOrSuperAdmin", policy =>
+        policy.RequireAssertion(context =>
+            context.User.IsInRole("Guest") || context.User.IsInRole("SuperAdmin")
+        )
+    );
+
 var app = builder.Build();
 // Configure the HTTP request pipeline.
 if (!app.Environment.IsDevelopment())
