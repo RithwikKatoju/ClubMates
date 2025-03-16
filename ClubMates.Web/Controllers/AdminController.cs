@@ -1,6 +1,8 @@
 ﻿using System.Security.Claims;
+using ClubMates.Web.AppDbContext;
 using ClubMates.Web.Models;
 using ClubMates.Web.Models.AccountViewModel;
+using ClubMates.Web.Models.AdminViewModel;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
@@ -9,11 +11,13 @@ using Microsoft.EntityFrameworkCore;
 
 namespace ClubMates.Web.Controllers
 {
-    public class AdminController(UserManager<ClubMatesUser> userManager) : Controller
+    [Authorize("GuestOrSuperAdmin")]
+    public class AdminController(UserManager<ClubMatesUser> userManager, AppIdentityDbContext _dbContext ) : Controller
     {
 
         private readonly UserManager<ClubMatesUser> _userManager = userManager;
-        [Authorize("GuestOrSuperAdmin")]
+        private readonly AppIdentityDbContext dbContext = _dbContext ;
+        
         public IActionResult Index()
         {
             return View();
@@ -208,6 +212,151 @@ namespace ClubMates.Web.Controllers
             }
             return View(new CreateUserViewModel());
         }
+
+        public async Task<IActionResult> ManageClubs()
+        {
+            var listOfClubs = await dbContext
+                                    .Clubs
+                                    .Include(x => x.ClubManager)
+                                    .ToListAsync();
+            List<ClubViewModel> clubViewModels = listOfClubs.Select(x => new ClubViewModel
+            {
+                ClubId = x.ClubId,
+                ClubName = x.ClubName,
+                ClubDescription = x.ClubDescription,
+                CLUBCATEGORY = x.CLUBCATEGORY,
+                CLUBTYPE = x.CLUBTYPE,
+                ClubRules = x.ClubRules,
+                ClubManager = x.ClubManager?.Email,
+                ClubContactNumber = x.ClubContactNumber,
+                ClubEmail = x.ClubEmail
+            }).ToList();
+            return View(clubViewModels);
+        }
+
+
+
+        public IActionResult CreateClub()
+        {
+            return View(new ClubViewModel());
+        }
+        [HttpPost]
+        public async Task<IActionResult> CreateClub(ClubViewModel clubViewModel)
+        {
+            if (!ModelState.IsValid)
+            {
+                return View(clubViewModel);
+            }
+            try
+            {
+                Club club = new()
+                {
+                    ClubName = clubViewModel.ClubName,
+                    ClubDescription = clubViewModel.ClubDescription,
+                    CLUBCATEGORY = clubViewModel.CLUBCATEGORY,
+                    CLUBTYPE = clubViewModel.CLUBTYPE,
+                    ClubRules = clubViewModel.ClubRules,
+                    ClubManager = await _userManager.FindByEmailAsync(clubViewModel.ClubManager ?? ""),
+                    ClubContactNumber = clubViewModel.ClubContactNumber,
+                    ClubEmail = clubViewModel.ClubEmail
+                };
+                dbContext.Clubs.Add(club);
+                await dbContext.SaveChangesAsync();
+                return RedirectToAction("ManageClubs");
+            }
+            catch (Exception ex)
+            {
+                ModelState.AddModelError(string.Empty, ex.Message);
+                return View(clubViewModel);
+            }
+
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> EditClub(int clubId)
+        {
+            if(!ModelState.IsValid)
+            {
+                return RedirectToAction("ManageClubs");
+            }
+            var club = await dbContext
+                .Clubs
+                .Include(x => x.ClubManager)
+                .FirstOrDefaultAsync(x=>x.ClubId == clubId);
+            if (club != null)
+            {
+                ClubViewModel clubViewModel = new()
+                {
+                    ClubId = club.ClubId,
+                    ClubName = club.ClubName,
+                    ClubDescription = club.ClubDescription,
+                    CLUBCATEGORY = club.CLUBCATEGORY,
+                    CLUBTYPE = club.CLUBTYPE,
+                    ClubRules = club.ClubRules,
+                    ClubManager = club.ClubManager?.Email,
+                    ClubContactNumber = club.ClubContactNumber,
+                    ClubEmail = club.ClubEmail
+                };
+                return View(clubViewModel);
+            }
+            return NotFound();
+        }
+
+
+        [HttpPost]
+        public async Task<IActionResult> EditClub(ClubViewModel clubViewModel)
+        {
+            if (!ModelState.IsValid)
+            {
+                return View(clubViewModel);
+            }
+            try
+            {
+                var club =await dbContext
+                    .Clubs
+                    .FindAsync(clubViewModel.ClubId);
+                if (club != null)
+                {
+                    club.ClubName = clubViewModel.ClubName;
+                    club.ClubDescription = clubViewModel.ClubDescription;
+                    club.CLUBCATEGORY = clubViewModel.CLUBCATEGORY;
+                    club.CLUBTYPE = clubViewModel.CLUBTYPE;
+                    club.ClubRules = clubViewModel.ClubRules;
+                    club.ClubContactNumber = clubViewModel.ClubContactNumber;
+                    club.ClubEmail = clubViewModel.ClubEmail;
+                    club.ClubManager =await _userManager.FindByEmailAsync(clubViewModel.ClubManager?? "");
+                    dbContext.Update(club);
+                    await dbContext.SaveChangesAsync();
+                    return RedirectToAction("ManageClubs");
+
+                }
+            }
+            catch (Exception ex)
+            {
+                ModelState.AddModelError(string.Empty, ex.Message);
+                return View(clubViewModel);
+            }
+            return NotFound();
+        }
+
+
+        public async Task<IActionResult> DeleteClub(int clubId)
+        {
+            if(!ModelState.IsValid)
+            {
+                return RedirectToAction("ManageClubs");
+            }
+            var club = await dbContext.Clubs.FindAsync(clubId);
+            if(club != null)
+            {
+                dbContext.Remove(club);
+                await dbContext.SaveChangesAsync();
+                return RedirectToAction("ManageClubs");
+            }
+            return NotFound();
+        }
+
+
 
     }
 }

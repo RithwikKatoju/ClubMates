@@ -9,6 +9,7 @@ namespace ClubMates.Web.AppDbContext
     public class AppIdentityDbContext(DbContextOptions<AppIdentityDbContext> options) : IdentityDbContext<ClubMatesUser>(options)
 
     {
+        public DbSet<Club> Clubs {  get; set; }
     }
 
 }

@@ -40,7 +40,7 @@ namespace ClubMates.Web.Controllers
                 Email = registerViewModel.Email,
                 Role = ClubMatesRole.Guest
             };
-            var result = _userManager.CreateAsync(user, registerViewModel.Password).Result;
+            var result = _userManager.CreateAsync(user, registerViewModel.Password??"Open@1234").Result;
             await _userManager.UpdateAsync(user);
             if (!result.Succeeded)
             {
@@ -97,6 +97,7 @@ namespace ClubMates.Web.Controllers
                 var claims = user != null ? await _userManager.GetClaimsAsync(user) : null;
                 if (claims != null)
                 {
+                    ViewData["ReturnUrl"] = ReturnUrl;
                     var scheme = IdentityConstants.ApplicationScheme;
                     var claimsIdentity = new ClaimsIdentity(claims, scheme);
                     var principle = new ClaimsPrincipal(claimsIdentity);
