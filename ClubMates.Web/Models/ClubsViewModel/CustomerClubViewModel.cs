@@ -1,14 +1,13 @@
-﻿using System.ComponentModel.DataAnnotations;
-using Microsoft.AspNetCore.Mvc.Rendering;
+﻿using Microsoft.AspNetCore.Mvc.Rendering;
+using System.ComponentModel.DataAnnotations;
 
-namespace ClubMates.Web.Models.AdminViewModel
+namespace ClubMates.Web.Models.ClubsViewModel
 {
-    public class ClubViewModel
+    public class CustomerClubViewModel
     {
-
         public int ClubId { get; set; }
 
-        [Required(ErrorMessage ="CLubNAme is mandatory")]
+        [Required(ErrorMessage = "CLubNAme is mandatory")]
         public string? ClubName { get; set; }
         public string? ClubDescription { get; set; }
         public ClubCategory CLUBCATEGORY { get; set; }
@@ -46,8 +45,5 @@ namespace ClubMates.Web.Models.AdminViewModel
                 return selectListItems;
             }
         }
-
-
     }
-    
 }

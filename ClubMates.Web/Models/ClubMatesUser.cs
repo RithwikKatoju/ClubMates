@@ -15,9 +15,7 @@ namespace ClubMates.Web.Models
     {
         User,
         Guest,
-        ClubMember,
-        ClubManager,
-        ClubAdmin,
+        ClubUser,
         SuperAdmin
     }
 

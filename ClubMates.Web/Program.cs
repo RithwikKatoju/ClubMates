@@ -8,7 +8,8 @@ var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 builder.Services.AddControllersWithViews();
-builder.Services.AddDbContext<AppIdentityDbContext>(options => options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
+builder.Services.AddDbContext<AppIdentityDbContext>(options => options
+.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
 
 builder.Services.AddAuthentication(options =>
     {
@@ -37,15 +38,10 @@ builder.Services.AddIdentity<ClubMatesUser, IdentityRole>(Options =>
 }).AddEntityFrameworkStores<AppIdentityDbContext>().AddDefaultTokenProviders();
 
 builder.Services.AddAuthorizationBuilder()
-    .AddPolicy("GuestOrSuperAdmin", policy => policy.RequireClaim(ClaimTypes.Role, "SuperAdmin", "Guest") )
+    .AddPolicy("GuestAndSuperAdmin", policy => policy.RequireClaim(ClaimTypes.Role, "SuperAdmin").RequireClaim(ClaimTypes.Role,"Guest"))
     .AddPolicy("MustBeAGuest", policy => policy.RequireClaim(ClaimTypes.Role, "Guest"));
 
-builder.Services.AddAuthorizationBuilder()
-    .AddPolicy("GuestOrSuperAdmin", policy =>
-        policy.RequireAssertion(context =>
-            context.User.IsInRole("Guest") || context.User.IsInRole("SuperAdmin")
-        )
-    );
+
 
 var app = builder.Build();
 // Configure the HTTP request pipeline.
@@ -64,6 +60,10 @@ app.UseRouting();
 app.UseAuthentication();
 
 app.UseAuthorization();
+
+app.MapControllerRoute(
+    name: "Club",
+    pattern: "Club/{controller=Home}/{action=Index}/{id?}");
 
 app.MapControllerRoute(
     name: "default",

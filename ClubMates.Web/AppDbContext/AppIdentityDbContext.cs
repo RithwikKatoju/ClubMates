@@ -10,6 +10,7 @@ namespace ClubMates.Web.AppDbContext
 
     {
         public DbSet<Club> Clubs {  get; set; }
+        public DbSet<ClubAccess> ClubsAccesses { get; set; }
     }
 
 }

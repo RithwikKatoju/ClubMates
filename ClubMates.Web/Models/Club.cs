@@ -15,6 +15,9 @@ namespace ClubMates.Web.Models
         public ClubMatesUser? ClubManager { get; set; }
         public string? ClubContactNumber { get; set; }
         public string? ClubEmail { get; set; }
+        public byte[]? ClubLogo { get; set; } = [];
+        public byte[]? ClubBanner { get; set; } = [];
+        public byte[]? ClubBackground { get; set; } = [];
 
     }
     public enum ClubCategory
@@ -30,7 +33,7 @@ namespace ClubMates.Web.Models
 
     public enum ClubType
     {
-        Private,
-        Public
+        Public,
+        Private
     }
 }

@@ -11,7 +11,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace ClubMates.Web.Controllers
 {
-    [Authorize("GuestOrSuperAdmin")]
+    [Authorize("GuestAndSuperAdmin")]
     public class AdminController(UserManager<ClubMatesUser> userManager, AppIdentityDbContext _dbContext ) : Controller
     {
 
@@ -87,7 +87,7 @@ namespace ClubMates.Web.Controllers
             return NotFound();
         }
 
-
+        [HttpPost]
         public async Task<IActionResult> EditUser(UserViewModel userViewModel)
         {
             if (!ModelState.IsValid)
@@ -112,7 +112,7 @@ namespace ClubMates.Web.Controllers
                             return View(userViewModel);
                         }
                         var claimsRequired = new List<Claim>
-                    { new (ClaimTypes.Name, userViewModel.Name ?? ""),
+                    { new (ClaimTypes.Name, userViewModel.Name ?? ""),                                                                                                                                                  
                         new (ClaimTypes.Role, Enum.GetName(userViewModel.Role)?? ""),
                         new (ClaimTypes.NameIdentifier, clubMatesUser.Id),
                         new (ClaimTypes.Email, userViewModel.Email ?? "")
@@ -143,7 +143,8 @@ namespace ClubMates.Web.Controllers
         }
 
 
-        public async Task<IActionResult> DeleteUser(string email)
+      
+  public async Task<IActionResult> DeleteUser(string email)
         {
             var accountUser = await _userManager.FindByEmailAsync(email);
             if (accountUser != null)
@@ -154,7 +155,6 @@ namespace ClubMates.Web.Controllers
             }
             return NotFound();
         }
-
         public IActionResult CreateUser()
         {
             return View(new CreateUserViewModel());
@@ -229,7 +229,10 @@ namespace ClubMates.Web.Controllers
                 ClubRules = x.ClubRules,
                 ClubManager = x.ClubManager?.Email,
                 ClubContactNumber = x.ClubContactNumber,
-                ClubEmail = x.ClubEmail
+                ClubEmail = x.ClubEmail,
+                ClubLogo = x.ClubLogo,
+                ClubBanner = x.ClubBanner,
+                ClubBackground = x.ClubBackground
             }).ToList();
             return View(clubViewModels);
         }
@@ -347,8 +350,19 @@ namespace ClubMates.Web.Controllers
                 return RedirectToAction("ManageClubs");
             }
             var club = await dbContext.Clubs.FindAsync(clubId);
+
             if(club != null)
             {
+                var clubAccesses = await dbContext.ClubsAccesses.
+                    Where(x => x.CLub == club)
+                    .ToListAsync();
+                if(clubAccesses != null && clubAccesses.Count > 0)
+                {
+                    foreach(var clubAccess in clubAccesses)
+                    {
+                        dbContext.Remove(clubAccess);
+                    }
+                }
                 dbContext.Remove(club);
                 await dbContext.SaveChangesAsync();
                 return RedirectToAction("ManageClubs");

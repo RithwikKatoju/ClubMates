@@ -46,4 +46,27 @@ body {
     }
 }
 
+.clubbutton {
+    width: 30%;
+}
+
+.btnTop {
+    padding-top: 20px;
+}
+.card {
+    background: black;
+    color: white;
+    border-radius: 10px;
+}
+
+.btn-primary {
+    border-radius: 15px;
+    background-color: #ffc107;
+}
+
+.btn-primary:hover {
+    background-color: #a6a62e;
+}
+
+
  
