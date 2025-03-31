@@ -1,5 +1,6 @@
 using System.Security.Claims;
 using ClubMates.Web.AppDbContext;
+using ClubMates.Web.Areas.Club.Services;
 using ClubMates.Web.Models;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
@@ -37,9 +38,11 @@ builder.Services.AddIdentity<ClubMatesUser, IdentityRole>(Options =>
     Options.User.RequireUniqueEmail = true;
 }).AddEntityFrameworkStores<AppIdentityDbContext>().AddDefaultTokenProviders();
 
+
+builder.Services.AddScoped<IClubLayoutService, ClubLayoutService>();
 builder.Services.AddAuthorizationBuilder()
     .AddPolicy("GuestAndSuperAdmin", policy => policy.RequireClaim(ClaimTypes.Role, "SuperAdmin").RequireClaim(ClaimTypes.Role,"Guest"))
-    .AddPolicy("MustBeAGuest", policy => policy.RequireClaim(ClaimTypes.Role, "Guest"));
+    .AddPolicy("MustBeAGuest", policy => policy.RequireClaim(ClaimTypes.Role, "Guest", "ClubUser"));
 
 
 
